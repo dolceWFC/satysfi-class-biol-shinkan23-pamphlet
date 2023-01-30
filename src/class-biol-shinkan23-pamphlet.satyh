@@ -1,3 +1,4 @@
+% License description
 % The following code is from "class-coins-shinkan23-pamphlet.satyh" (https://github.com/coins-shinkan23) contained in "coins-shinkan23/satysfi-class-coins-shinkan23-pamphlet" (https://github.com/coins-shinkan23/satysfi-class-coins-shinkan23-pamphlet/blob/main/src/class-coins-shinkan23-pamphlet.satyh), from which the code is borrowed and modified.
 % Also, the original code is borrowed from "stdjabook.satyh" (https://github.com/gfngfn) contained in "gfngfn/SATySFi" (https://github.com/gfngfn/SATySFi /SATySFi/blob/master/lib-satysfi/dist/packages/stdjabook.satyh).
 % Since SATySFi is licensed under LGPL-3.0, the same license was granted to satysfi-coinsshinkan23pamphlet.
@@ -23,7 +24,7 @@ type position =
   | Here
 
 
-module CoinsShinkan23Pamphlet : sig
+module BiolShinkan23Pamphlet : sig
 
   val document : 'a -> block-text -> document
     constraint 'a :: (|
@@ -31,13 +32,8 @@ module CoinsShinkan23Pamphlet : sig
       num-chapter : int;
       start-page : int;
     |)
-  
-  val document-two-column : 'a -> block-text -> document
-    constraint 'a :: (|
-      title : inline-text;
-      start-page : int;
-    |)
 
+%%supply commands
   direct \ref : [string] inline-cmd
   direct \ref-page : [string] inline-cmd
   direct +figure : [string?; position; inline-text; block-text] block-cmd
@@ -48,7 +44,6 @@ module CoinsShinkan23Pamphlet : sig
   direct +bunseki : [inline-text] block-cmd
   direct +column : [inline-text; inline-text; block-text] block-cmd
   direct +framebox : [block-text] block-cmd
-  direct +tsukuba-word : [string?; inline-text; inline-text] block-cmd 
   direct \emph : [inline-text] inline-cmd
   direct \footnote : [inline-text] inline-cmd
   direct \url : [string] inline-cmd
@@ -67,26 +62,26 @@ end = struct
   let no-pads = (0pt, 0pt, 0pt, 0pt)
 
 
-  let font-size-normal  = 9pt
-  let font-size-section = 14pt
-  let font-size-subsection = 12pt
-  let font-size-title = 20pt
+  let font-size-normal  = 10pt
+  let font-size-section = 16pt
+  let font-size-subsection = 14pt
 
   let section-top-margin = 20pt
   let section-bottom-margin = 12pt
   let section-top-padding = 6pt
   let section-bottom-padding = 7pt
 
-  let font-ratio = 1.
+  let font-ratio-latin = 1.
+  let font-ratio-cjk = 1.
 
-  let font-latin-roman  = (`fonts-noto-serif:NotoSerif-Regular`, font-ratio, 0.)
-  let font-latin-bold   = (`fonts-noto-serif:NotoSerif-Bold` , font-ratio, 0.)
-  let font-latin-serif-italic = (`fonts-noto-serif:NotoSerif-Italic`, font-ratio, 0.)
-  let font-latin-sans-italic = (`fonts-noto-sans:NotoSans-Italic`, font-ratio, 0.)
-  let font-latin-sans   = (`fonts-noto-sans:NotoSans-Regular`, font-ratio, 0.)
-  let font-cjk-mincho   = (`fonts-noto-serif-cjk-jp:NotoSerifCJKjp-Regular`, font-ratio, 0.)
-  let font-cjk-gothic   = (`fonts-noto-sans-cjk-jp:NotoSansCJKjp-Regular`, font-ratio, 0.)
-  let font-cjk-gothic-b = (`fonts-noto-sans-cjk-jp:NotoSansCJKjp-Medium`, font-ratio, 0.)
+  let font-latin-roman  = (`Junicode`   , font-ratio-latin, 0.)
+  let font-latin-bold   = (`Junicode-b` , font-ratio-latin, 0.)
+  let font-latin-italic = (`Junicode-it`, font-ratio-latin, 0.)
+  let font-latin-bold   = (`Junicode-b` , font-ratio-latin, 0.)
+  let font-latin-sans   = (`lmsans`    , font-ratio-latin, 0.)
+  let font-latin-mono   = (`lmmono`    , font-ratio-latin, 0.)
+  let font-cjk-mincho   = (`ipaexm`    , font-ratio-cjk  , 0.)
+  let font-cjk-gothic   = (`ipaexg`    , font-ratio-cjk  , 0.)
 
 
   let set-latin-font font ctx =
@@ -126,7 +121,6 @@ end = struct
       |> set-min-paragraph-ascender-and-descender 0pt 0pt
       |> set-leading 5pt
       |> set-min-gap-of-lines 5pt
-      |> set-font-size font-size-normal
 
 
 let title-deco =
@@ -205,24 +199,25 @@ let title-deco =
   let chapter-heading ctx num title =
     let line-width = get-text-width ctx in
     let ctx =
-      ctx |> set-paragraph-margin 15pt 1pt
+      ctx |> set-paragraph-margin 10pt 1pt
           |> set-min-paragraph-ascender-and-descender 0pt 0pt
           |> set-leading 4pt
     in
     let bar-height = 45pt in
     let circle-size = 33pt in
     let ctx-d =
-      ctx |> set-cjk-font font-cjk-gothic-b
-          |> set-text-color Color.white
-          |> set-font-size 23pt
+      ctx |> set-cjk-font font-cjk-gothic
+          |> set-text-color Color.black
+          |> set-font-size 30pt
     in
-    let dai-ib = read-inline ctx-d {第} in
-    let syou-ib = read-inline ctx-d {章} in
+    %%About Title Design
+    let dai-ib = read-inline ctx-d {Chapter} in
+    %%let syou-ib = read-inline ctx-d {Titles} in
     let num-it = num |> arabic |> embed-string in
     let ctx-num  =
-      ctx |> set-cjk-font font-cjk-gothic-b
-          |> set-text-color Color.white
-          |> set-font-size 50pt
+      ctx |> set-cjk-font font-cjk-gothic
+          |> set-text-color Color.black
+          |> set-font-size 45pt
     in
     let num-ib = read-inline ctx-num num-it in
     let bb-num =
@@ -231,30 +226,31 @@ let title-deco =
           List.map (shift-graphics pt)
             [
               % 背景の帯
-              Gr.rectangle (0pt, 0pt) (line-width, bar-height)
-              |> fill (Color.gray 0.2);
-              Gr.circle (line-width *' 0.5, bar-height *' 0.5) circle-size
-              |> fill (Color.gray 0.2);
-              draw-text-centering (line-width *' 0.38, bar-height *' 0.5) dai-ib;
-              draw-text-centering (line-width *' 0.5, bar-height *' 0.5) num-ib;
-              draw-text-centering (line-width *' 0.62, bar-height *' 0.5) syou-ib;
+              Gr.rectangle (0pt, -27pt) (line-width *' 0.03, bar-height *' 0.73)
+              |> fill (Color.gray 0.3);
+              %%Gr.circle (line-width *' 0.5, bar-height *' 0.5) circle-size
+              %%|> fill (Color.gray 0.2);
+              draw-text-centering (line-width *' 0.15, bar-height *' 0.24) dai-ib;
+              draw-text-centering (line-width *' 0.29, bar-height *' 0.38) num-ib;
+              %%draw-text-centering (line-width *' 0.62, bar-height *' 0.5) syou-ib;
             ]
         )
       )
     in
     let ctx-title =
-      ctx |> set-font-size font-size-title
+      ctx |> set-font-size 20pt
           |> set-font-gothic
     in
-    let ib-title = inline-fil ++ (read-inline ctx-title title) ++ inline-fil in
+    let ib-title = inline-skip 20pt ++ (read-inline ctx-title title) ++ inline-fil in
     let bb-title = line-break false false ctx-title ib-title in
     let bar-height = 2pt in
     let bar =
       line-break false false ctx-title (
         inline-graphics line-width (bar-height *' 0.5) (bar-height *' 0.5) (fun pt ->
           [
+            %%仕切り線
             Gr.line (0pt, 0pt) (line-width, 0pt)
-            |> stroke bar-height (Color.gray 0.2)
+            |> stroke bar-height (Color.gray 0.3)
             |> shift-graphics pt
           ]
         )
@@ -332,7 +328,7 @@ let title-deco =
 
     % -- title --
     let bb-title =
-      chapter-heading ctx-doc !num-chapter title 
+      chapter-heading ctx-doc !num-chapter title
     in
 
     % -- main --
@@ -391,7 +387,7 @@ let title-deco =
       in
       let footer =
         let ctx = get-standard-context ftrwid in
-        let bar-width = 5pt in
+        let bar-width = 4pt in
         let bar-height = get-font-size ctx *' 1.2 in
         let bar-depth = get-font-size ctx *' 0.5 in
         let bar =
@@ -407,11 +403,14 @@ let title-deco =
         if pageno mod 2 == 0 then
           % 偶数ページは左端にページ番号
           line-break true true ctx
-            ((read-inline ctx {#it-pageno;}) ++ inline-skip 5pt ++ bar ++ inline-fil)
+            (
+              (read-inline ctx {#it-pageno;}) ++ inline-skip 5pt ++
+              bar ++ inline-skip 5pt ++ read-inline ctx title
+            )
         else
           line-break true true ctx
             (
-              inline-fil ++ read-inline ctx {2023年度情報科学類新歓パンフレット} ++ inline-skip 5pt ++
+              inline-fil ++ read-inline ctx {2023年度生物学類新歓パンフレット} ++ inline-skip 5pt ++
               bar ++ inline-skip 5pt ++ (read-inline ctx {#it-pageno;})
             )
       in
@@ -569,11 +568,6 @@ let title-deco =
     in
       form-paragraph ctx br-parag
 
-  let-block ctx +bunseki name =
-    let br-parag =
-      inline-fil ++ read-inline ctx { 《文責: #name;》 }
-    in
-      form-paragraph ctx br-parag
 
   let section-scheme ctx label title outline-title-opt inner =
     let ctx-title = make-section-title ctx in
@@ -640,7 +634,7 @@ let title-deco =
 
   let-inline ctx \emph inner =
     let ctx-emph =
-      ctx |> set-font Latin font-latin-sans-italic
+      ctx |> set-font Latin font-latin-italic
           |> set-cjk-font font-cjk-gothic
           |> set-text-color (CMYK(1., 0., 0., 0.))
     in
@@ -669,6 +663,9 @@ let title-deco =
     in
       FootnoteScheme.main ctx ibf bbf
 
+
+  let-block ctx +bunseki name =
+    line-break true true ctx (inline-fil ++ read-inline ctx { 《文責: #name;》 })
 
   let-inline ctx \non-hyph str =
     let s-lst = string-explode str in
@@ -722,7 +719,7 @@ let title-deco =
       in
       (decoS, decoH, Deco.empty, decoT)
     in
-    let ctx = ctx |> set-paragraph-margin 50pt 15pt in
+    let ctx = ctx |> set-paragraph-margin 15pt 15pt in
     block-frame-breakable ctx pads deco-set (fun ctx -> (
       let ctx =
         ctx |> set-paragraph-margin 5pt 5pt
@@ -732,8 +729,7 @@ let title-deco =
       let line-width = get-text-width ctx in
       let title-ctx =
         ctx |> set-cjk-font font-cjk-gothic
-            |> set-latin-font font-latin-serif-italic
-            |> set-font-size font-size-subsection
+            |> set-latin-font font-latin-italic
       in
       let head-ib =
         inline-skip side-gap ++
@@ -768,32 +764,9 @@ let title-deco =
       let ctx = ctx |> set-paragraph-margin 5pt 5pt in
       read-block ctx text
     ))
-  
-  let-block ctx +tsukuba-word ?:word-str yomi description =
-    let ctx-head = ctx |> set-cjk-font font-cjk-gothic
-                       |> set-latin-font font-cjk-gothic
-                       |> set-font-size 10pt
-    in
-    let head =
-      match word-str with
-      | Some(word-str) -> let word = embed-string word-str in
-                            read-inline ctx-head {#yomi;【#word;】}
-      | None           -> read-inline ctx-head {#yomi;　}
-    in
-    let body = read-inline ctx {#description;} in
-    let b1 = line-break true true ctx head in
-    let b2 =
-      let br-parag =
-        body ++ inline-fil
-      in
-        form-paragraph ctx br-parag
-    in
-      b1 +++ b2
 
 end
 
 
-let document = CoinsShinkan23Pamphlet.document
+let document = BiolShinkan23Pamphlet.document
   % ad-hoc
-
-let document-two-column = CoinsShinkan23Pamphlet.document-two-column
