@@ -2,8 +2,12 @@
 @require: fss/fss
 @require: fss/style
 @require: itemize
+@require: easytable/easytable
 @require: latexcmds/latexcmds
 
+open EasyTableAlias
+
+in
 document (|
   title = {パンフレットフォーマット（これがtitle）};
   num-chapter = 1;
@@ -30,36 +34,15 @@ document (|
               *図:table
             *表:figure
         }
-        +figure (Here) {その場に出力される図} <
-          +centering {
-            \fbox {\parbox (5cm) <
-              +p{図の代わりとなる文章1}
-              +p{図の代わりとなる文章2}
-              +p{図の代わりとなる文章3}
-              +p{図の代わりとなる文章4}
-            >
-          }}
-        >
-        +figure (Top) {浮動する図} <
-          +centering {
-            \fbox {\parbox (5cm) <
-              +p{図の代わりとなる文章1}
-              +p{図の代わりとなる文章2}
-              +p{図の代わりとなる文章3}
-              +p{図の代わりとなる文章4}
-            >
-          }}
-        >
-        +table (Top) {浮動する表} <
-          +centering {
-            \fbox {\parbox (5cm) <
-              +p{表の代わりとなる文章1}
-              +p{表の代わりとなる文章2}
-              +p{表の代わりとなる文章3}
-              +p{表の代わりとなる文章4}
-            >
-          }}
-        >
+        +p{
+            easytableを用いることで次のような表記ができます.
+        }
+        +easytable[c;c;c]{
+          |科目|最高点|最低点
+          |英語|112|36
+          |数学|133|24
+          |国語|78|20|
+        }
       >
       +newpage;
       +subsection{環境について} <
