@@ -5,20 +5,20 @@
 @require: latexcmds/latexcmds
 
 document (|
-  title = {パンフレットフォーマット(これがtitle)};
+  title = {パンフレットフォーマット（これがtitle）};
   num-chapter = 1;
   start-page = 1;
 |) '<
-    +section{この文書について(これがsection)} <
+    +section{この文書について（これがsection）} <
         +p {
             この文書は\SATySFi;によって作られています.
         }
-      +subsection{レイヤー構造について(これがsubsection)} <
+      +subsection{レイヤー構造について（これがsubsection）} <
         +p {
             文書はtitle, section, subsection, paragraphの四段レイヤーによって成立しています.
             様々なコマンドによってスタイルを定義できますが, コマンドのapplyはこちらで行います.
             レイヤーがわかるような文書を.txt, .docxなどで提出してください. \linebreak;
-            (これがparagraph)
+            （これがparagraph）
         }
       >
       +subsection{図や表の挿入について} <
@@ -96,8 +96,9 @@ document (|
     >
   +bunseki { 島村啓生 }
 
-  +column {コラム・Column} {} <
-    +p{\SATySFi;}
-    +p{\SATySFi;}
+  +column {\SATySFi;について} {島村啓生} <
+    +p{
+      \SATySFi;は、函型関数系の言語を用いてバグ報告能力を改善することで、よりユーザビリティに優れた組版処理を可能としたマークアップ言語です。
+    }
   >
 >
