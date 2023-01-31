@@ -735,7 +735,7 @@ let title-deco =
         inline-skip side-gap ++
         read-inline title-ctx {Column. #column-num-it; \ \ \ #title;} ++
         inline-fil ++
-        read-inline title-ctx {《Writer:\ #author;》} ++
+        read-inline title-ctx {Writer:\ #author;} ++
         inline-skip side-gap
       in
       let bar-height = 1.5pt in
