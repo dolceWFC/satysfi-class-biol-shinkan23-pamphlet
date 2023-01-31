@@ -33,7 +33,7 @@ document (|
         +p{
             easytableを用いることで次のような表記ができます.
         }
-        +figure(Top){各科目の最高点と最低点}<
+        +figure(Here){各科目の最高点と最低点}<
           +easytable[c;c;c]{
             |科目|最高点|最低点
             |英語|112|36
@@ -79,10 +79,14 @@ document (|
       +framebox <
         +p {
           \SATySFi;
-          \doublebox{doublebox}
+          \doublebox{doublebox} \linebreak;
+          \font-style[bold]{bold}\ \font-style[italic]{italic}
         }
       >
       +p{
+        この文書のクラスファイルや文書のソースコードはこちらから \linebreak;
+        \url(`https://github.com/dolceWFC/satysfi-class-biol-shinkan23-pamphlet`);
+        \linebreak;
         今後のアップデート予定については, \ref(`Kongo`);を参照してください（相互参照）. \linebreak;
         この文は2023年1月31日に書かれています.\footnote{他の文章がそうであるということは意味しない.}
       }
