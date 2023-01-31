@@ -63,7 +63,7 @@ end = struct
 
 
   let font-size-normal  = 10pt
-  let font-size-section = 16pt
+  let font-size-section = 18pt
   let font-size-subsection = 14pt
 
   let section-top-margin = 20pt
@@ -74,6 +74,7 @@ end = struct
   let font-ratio-latin = 1.
   let font-ratio-cjk = 1.
 
+%% font-settings
   let font-latin-roman  = (`system:Baskerville` , font-ratio-latin, 0.)
   let font-latin-bold   = (`system:Baskerville-Bold` , font-ratio-latin, 0.)
   let font-latin-italic = (`system:Baskerville-Italic`, font-ratio-latin, 0.)
@@ -120,7 +121,7 @@ end = struct
       |> set-leading 5pt
       |> set-min-gap-of-lines 5pt
 
-
+%% title-settings
 let title-deco =
     let pads = (5pt, 5pt, 10pt, 10pt) in
     let deco (x, y) wid hgt dpt =
@@ -223,8 +224,8 @@ let title-deco =
         inline-graphics line-width bar-height 0pt (fun pt ->
           List.map (shift-graphics pt)
             [
-              % 背景の帯
-              Gr.rectangle (0pt, -27pt) (line-width *' 0.03, bar-height *' 0.73)
+              % タイトル横のバー
+              Gr.rectangle (0pt, -34pt) (line-width *' 0.03, bar-height *' 0.76)
               |> fill (Color.gray 0.3);
               %%Gr.circle (line-width *' 0.5, bar-height *' 0.5) circle-size
               %%|> fill (Color.gray 0.2);
@@ -236,8 +237,9 @@ let title-deco =
       )
     in
     let ctx-title =
-      ctx |> set-font-size 20pt
-          |> set-font-gothic
+      ctx |> set-font-size 22pt
+          |> set-cjk-font font-cjk-gothic
+          |> set-latin-font font-latin-roman
     in
     let ib-title = inline-skip 20pt ++ (read-inline ctx-title title) ++ inline-fil in
     let bb-title = line-break false false ctx-title ib-title in
@@ -726,23 +728,23 @@ let title-deco =
       in
       let line-width = get-text-width ctx in
       let title-ctx =
-        ctx |> set-cjk-font font-cjk-gothic
+        ctx |> set-cjk-font font-cjk-mincho
             |> set-latin-font font-latin-italic
       in
       let head-ib =
         inline-skip side-gap ++
-        read-inline title-ctx {Column #column-num-it; #title;} ++
+        read-inline title-ctx {Column. #column-num-it; \ \ \ #title;} ++
         inline-fil ++
-        read-inline ctx {\sans{文責：#author;}} ++
+        read-inline title-ctx {《Writer:\ #author;》} ++
         inline-skip side-gap
       in
-      let bar-height = 2pt in
+      let bar-height = 1.5pt in
       let bar =
         line-break false false ctx (
-          inline-graphics line-width (bar-height *' 0.5) (bar-height *' 0.5) (fun pt ->
+          inline-graphics line-width (bar-height *' 1.0) (bar-height *' 1.0) (fun pt ->
             [
-              Gr.line (0pt, 0pt) (line-width, 0pt)
-              |> stroke bar-height (Color.gray 0.6)
+              Gr.line (0pt, 0pt) (line-width, 3pt)
+              |> stroke bar-height (Color.gray 0.3)
               |> shift-graphics pt
             ]
           )
