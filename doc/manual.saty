@@ -78,10 +78,18 @@ document (|
     >
     +section {様々なblockcmd、inlinecmd} <
       +framebox <
-        +p {\SATySFi;}
+        +p {
+          \SATySFi;
+          \doublebox{doublebox}
+        }
       >
+      +p{
+        今後のアップデート予定については, \ref(`Kongo`);を参照してください（相互参照）. \linebreak;
+        この文は2023年1月31日に書かれています.\footnote{他の文章がそうであるということは意味しない.}
+      }
     >
-    +section{今後について} <
+    +newpage;
+    +section?:(`Kongo`){今後について} <
         +p {
             今後もしばらくはコマンドのアップデートを続けます。基本的な文章構造は変わりません。
         }
