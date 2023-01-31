@@ -13,88 +13,87 @@ document (|
         +p {
             この文書は\SATySFi;によって作られています.
         }
-        +subsection{レイヤー構造について(これがsubsection)} <
+      +subsection{レイヤー構造について(これがsubsection)} <
         +p {
             文書はtitle, section, subsection, paragraphの四段レイヤーによって成立しています.
             様々なコマンドによってスタイルを定義できますが, コマンドのapplyはこちらで行います.
             レイヤーがわかるような文書を.txt, .docxなどで提出してください. \linebreak;
             (これがparagraph)
         }
-        >
-        +subsection{図や表の挿入について} <
-          +p {
-              図や表はこちらでコマンドによって処理します. \linebreak;
-              図や表の構成がわかるように記述してください.
-          }
-          +listing {
+      >
+      +subsection{図や表の挿入について} <
+        +p {
+            図や表はこちらでコマンドによって処理します. \linebreak;
+            図や表の構成がわかるように記述してください.
+        }
+        +listing {
               *図:table
-              *表:figure
-          }
-          +figure (Here) {その場に出力される図} <
-            +centering {
-              \fbox {\parbox (5cm) <
-                +p{図の代わりとなる文章1}
-                +p{図の代わりとなる文章2}
-                +p{図の代わりとなる文章3}
-                +p{図の代わりとなる文章4}
-              >
-            }}
-          >
-          +figure (Top) {浮動する図} <
-            +centering {
-              \fbox {\parbox (5cm) <
-                +p{図の代わりとなる文章1}
-                +p{図の代わりとなる文章2}
-                +p{図の代わりとなる文章3}
-                +p{図の代わりとなる文章4}
-              >
-            }}
-          >
-          +table (Top) {浮動する表} <
-            +centering {
-              \fbox {\parbox (5cm) <
-                +p{表の代わりとなる文章1}
-                +p{表の代わりとなる文章2}
-                +p{表の代わりとなる文章3}
-                +p{表の代わりとなる文章4}
-              >
-            }}
-          >
+            *表:figure
+        }
+        +figure (Here) {その場に出力される図} <
+          +centering {
+            \fbox {\parbox (5cm) <
+              +p{図の代わりとなる文章1}
+              +p{図の代わりとなる文章2}
+              +p{図の代わりとなる文章3}
+              +p{図の代わりとなる文章4}
+            >
+          }}
         >
-        +subsection{環境について} <
-          +p{
-            参照するクラスファイルは, \linebreak;
-            \listing{
-                * \@require: Biol23-Pamphlet
-                * \@require: fss/fss
-                * \@require: fss/style
-                * \@require: itemize
-                * \@require: latexcmds/latexcmds
-            }
-            です. \SATySFi;, satyrographosを使用し, 上記パッケージをインストールしてください.
-          }
+        +figure (Top) {浮動する図} <
+          +centering {
+            \fbox {\parbox (5cm) <
+              +p{図の代わりとなる文章1}
+              +p{図の代わりとなる文章2}
+              +p{図の代わりとなる文章3}
+              +p{図の代わりとなる文章4}
+            >
+          }}
         >
+        +table (Top) {浮動する表} <
+          +centering {
+            \fbox {\parbox (5cm) <
+              +p{表の代わりとなる文章1}
+              +p{表の代わりとなる文章2}
+              +p{表の代わりとなる文章3}
+              +p{表の代わりとなる文章4}
+            >
+          }}
+        >
+      >
+      +newpage;
+      +subsection{環境について} <
+        +p{
+          参照するクラスファイルは, \linebreak;
+          \listing{
+              * \@require: Biol23-Pamphlet
+              * \@require: fss/fss
+              * \@require: fss/style
+              * \@require: itemize
+              * \@require: latexcmds/latexcmds
+          }
+          です. \SATySFi;, satyrographosを使用し, 上記パッケージをインストールしてください.
+        }
+      >
     >
-    +newpage;
     +section{デザインについて} <
-        +subsection{フッターについて} <
+      +subsection{フッターについて} <
         +p {
             左ページのフッターにはページ番号と章タイトルが表示されます. \linebreak;
             右ページのフッターにはページ番号と冊子タイトルが表示されます.
         }
-        >
+      >
+    >
+    +section {様々なblockcmd、inlinecmd} <
+      +framebox <
+        +p {\SATySFi;}
+      >
     >
     +section{今後について} <
         +p {
             今後もしばらくはコマンドのアップデートを続けます。基本的な文章構造は変わりません。
         }
     >
-
-    +section {様々なblockcmd、inlinecmd} <
-    +framebox <
-      +p {\SATySFi;}
-    >
-  >
   +bunseki { 島村啓生 }
 
   +column {コラム・Column} {} <
