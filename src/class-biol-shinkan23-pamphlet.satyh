@@ -757,8 +757,8 @@ let title-deco =
 
 
   let-block ctx +framebox text =
-    let pads = (10pt, 10pt, 10pt, 10pt) in
-    let deco-set = VDecoSet.simple-frame 2pt Color.black Color.white in
+    let pads = (5pt, 5pt, 5pt, 5pt) in
+    let deco-set = VDecoSet.simple-frame 1.0pt Color.black Color.white in
     let ctx = ctx |> set-paragraph-margin 15pt 15pt in
     block-frame-breakable ctx pads deco-set (fun ctx -> (
       let ctx = ctx |> set-paragraph-margin 5pt 5pt in
