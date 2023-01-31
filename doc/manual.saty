@@ -43,13 +43,24 @@ document (|
           |数学|133|24
           |国語|78|20|
         }
+        +p{
+          なお、easytableは以下のように文中に埋め込むこともできます。 \linebreak;
+          これが表です。
+          \easytable[c;c;c]{
+            |科目|最高点|最低点
+            |英語|112|36
+            |数学|133|24
+            |国語|78|20|
+          }
+          デザインとしては今ひとつですが。
+        }
       >
       +newpage;
       +subsection{環境について} <
         +p{
           参照するクラスファイルは, \linebreak;
           \listing{
-              * \@require: Biol23-Pamphlet
+              * \@require: Biol23-Pamphlet （まだパッケージ化していません）
               * \@require: fss/fss
               * \@require: fss/style
               * \@require: itemize
