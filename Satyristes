@@ -4,28 +4,24 @@
 ;; Library declaration
 (library
   ;; Library name
-  (name "class-coins-shinkan23-pamphlet")
+  (name "class-biol-shinkan23-pamphlet")
   ;; Library version
   (version "0.0.1")
   ;; Files
   (sources
     ((packageDir "src")))
   ;; OPAM package file
-  (opam "satysfi-class-coins-shinkan23-pamphlet.opam")
+  (opam "satysfi-class-biol-shinkan23-pamphlet.opam")
   ;; Dependency
   (dependencies
     ((dist ()) ; Standard library
      (base ()) ; Base library
-     (fonts-noto-sans ())
-     (fonts-noto-serif ())
-     (fonts-noto-sans-cjk-jp ())
-     (fonts-noto-serif-cjk-jp ())
     )))
 
 ;; Library doc declaration
 (libraryDoc
   ;; Library doc name
-  (name "class-coins-shinkan23-pamphlet-doc")
+  (name "class-biol-shinkan23-pamphlet-doc")
   ;; Library version
   (version "0.0.1")
   ;; Working directory to build docs
@@ -38,10 +34,10 @@
   (sources
     ((doc "manual.pdf" "doc/manual.pdf")))
   ;; OPAM package file
-  (opam "satysfi-class-coins-shinkan23-pamphlet-doc.opam")
+  (opam "satysfi-class-biol-shinkan23-pamphlet-doc.opam")
   ;; Dependency
   (dependencies
-    ((class-coins-shinkan23-pamphlet ()) ; the main library
+    ((class-biol-shinkan23-pamphlet ()) ; the main library
      (dist ()) ; Standard library
      (lipsum ())
      (latexcmds ())
