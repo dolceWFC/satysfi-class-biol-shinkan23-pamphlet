@@ -20,6 +20,7 @@ depends: [
 
   # Other libraries
   "satysfi-dist"
+  "satysfi-lipsum" { >= "0.2.0" & < "0.3.0" }
   "satysfi-latexcmds" { >= "0.1.0" & < "0.2.0"}
 ]
 build: [
