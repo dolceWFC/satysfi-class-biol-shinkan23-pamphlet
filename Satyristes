@@ -1,5 +1,5 @@
 ;; For Satyrographos 0.0.2 series
-(version 0.0.2)
+(version 0.0.2.11)
 
 ;; Library declaration
 (library
