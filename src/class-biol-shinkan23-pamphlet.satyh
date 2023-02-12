@@ -218,7 +218,7 @@ let title-deco =
           |> set-text-color Color.black
           |> set-font-size 45pt
     in
-    let num-ib = read-inline ctx-num num-it in
+    let num-ib = inline-skip 20pt ++ (read-inline ctx-num num-it) ++ inline-fil in
     let bb-num =
       line-break false false ctx (
         inline-graphics line-width bar-height 0pt (fun pt ->
