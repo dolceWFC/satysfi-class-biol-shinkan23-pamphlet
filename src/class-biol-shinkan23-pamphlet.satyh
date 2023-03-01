@@ -634,7 +634,7 @@ let title-deco =
 
   let-inline ctx \emph inner =
     let ctx-emph =
-      ctx |> set-font Latin font-latin-italic
+      ctx |> set-font Latin font-latin-sans
           |> set-cjk-font font-cjk-gothic
           |> set-text-color (CMYK(1., 0., 1., 0.))
     in
