@@ -230,7 +230,7 @@ let title-deco =
               %%Gr.circle (line-width *' 0.5, bar-height *' 0.5) circle-size
               %%|> fill (Color.gray 0.2);
               draw-text-centering (line-width *' 0.15, bar-height *' 0.24) dai-ib;
-              draw-text-centering (line-width *' 0.29, bar-height *' 0.40) num-ib;
+              draw-text-centering (line-width *' 0.30, bar-height *' 0.37) num-ib;
               %%draw-text-centering (line-width *' 0.62, bar-height *' 0.5) syou-ib;
             ]
         )
@@ -636,7 +636,7 @@ let title-deco =
     let ctx-emph =
       ctx |> set-font Latin font-latin-italic
           |> set-cjk-font font-cjk-gothic
-          |> set-text-color (CMYK(1., 0., 0., 0.))
+          |> set-text-color (CMYK(1., 0., 1., 0.))
     in
       read-inline ctx-emph inner
 
