@@ -642,7 +642,7 @@ let title-deco =
 
 
   let-inline ctx \footnote it =
-    let size = get-font-size ctx in
+    let size = font-size-normal in
     let ibf num =
       let it-num = embed-string (arabic num) in
       let ctx =
