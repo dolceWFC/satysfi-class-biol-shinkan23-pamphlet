@@ -62,9 +62,9 @@ end = struct
 
 
   let font-size-normal  = 9pt
-  let font-size-section = 14pt
+  let font-size-section = 25pt
   let font-size-subsection = 12pt
-  let font-size-title = 20pt
+  let font-size-title = 36pt
 
   let section-top-margin = 20pt
   let section-bottom-margin = 12pt
@@ -73,14 +73,13 @@ end = struct
 
   let font-ratio = 1.
 
-  let font-latin-roman  = (`fonts-noto-serif:NotoSerif-Regular`, font-ratio, 0.)
-  let font-latin-bold   = (`fonts-noto-serif:NotoSerif-Bold` , font-ratio, 0.)
-  let font-latin-serif-italic = (`fonts-noto-serif:NotoSerif-Italic`, font-ratio, 0.)
-  let font-latin-sans-italic = (`fonts-noto-sans:NotoSans-Italic`, font-ratio, 0.)
-  let font-latin-sans   = (`fonts-noto-sans:NotoSans-Regular`, font-ratio, 0.)
-  let font-cjk-mincho   = (`fonts-noto-serif-cjk-jp:NotoSerifCJKjp-Regular`, font-ratio, 0.)
-  let font-cjk-gothic   = (`fonts-noto-sans-cjk-jp:NotoSansCJKjp-Regular`, font-ratio, 0.)
-  let font-cjk-gothic-b = (`fonts-noto-sans-cjk-jp:NotoSansCJKjp-Medium`, font-ratio, 0.)
+  let font-latin-roman  = (`system:Baskerville` , font-ratio, 0.)
+  let font-latin-bold   = (`system:Baskerville-Bold` , font-ratio, 0.)
+  let font-latin-italic = (`system:Baskerville-Italic`, font-ratio, 0.)
+  let font-latin-sans   = (`system:Optima-Regular` , font-ratio, 0.)
+  let font-latin-mono   = (`Optima-ExtraBlack`    , font-ratio, 0.)
+  let font-cjk-mincho   = (`system:HiraMinPro-W3`    , font-ratio, 0.)
+  let font-cjk-gothic   = (`system:HiraginoSans-W3`    , font-ratio, 0.)
 
 
   let set-latin-font font ctx =
@@ -206,7 +205,7 @@ let title-deco =
     let bar-height = 45pt in
     let circle-size = 33pt in
     let ctx-d =
-      ctx |> set-cjk-font font-cjk-gothic-b
+      ctx |> set-cjk-font font-cjk-gothic
           |> set-text-color Color.white
           |> set-font-size 23pt
     in
@@ -214,7 +213,7 @@ let title-deco =
     let syou-ib = read-inline ctx-d {章} in
     let num-it = num |> arabic |> embed-string in
     let ctx-num  =
-      ctx |> set-cjk-font font-cjk-gothic-b
+      ctx |> set-cjk-font font-cjk-gothic
           |> set-text-color Color.white
           |> set-font-size 50pt
     in
@@ -394,11 +393,14 @@ let title-deco =
         if pageno mod 2 == 0 then
           % 偶数ページは左端にページ番号
           line-break true true ctx
-            ((read-inline ctx {#it-pageno;}) ++ inline-skip 5pt ++ bar ++ inline-fil)
+            (
+              (read-inline ctx {#it-pageno;}) ++ inline-skip 5pt ++
+              bar ++ inline-skip 5pt ++ read-inline ctx title
+            )
         else
           line-break true true ctx
             (
-              inline-fil ++ read-inline ctx {2023年度情報科学類新歓ブックレット} ++ inline-skip 5pt ++
+              inline-fil ++ read-inline ctx {2023年度生物学類新歓パンフレット} ++ inline-skip 5pt ++
               bar ++ inline-skip 5pt ++ (read-inline ctx {#it-pageno;})
             )
       in
@@ -628,7 +630,7 @@ let title-deco =
 
   let-inline ctx \emph inner =
     let ctx-emph =
-      ctx |> set-font Latin font-latin-sans-italic
+      ctx |> set-font Latin font-latin-sans
           |> set-cjk-font font-cjk-gothic
           |> set-text-color (CMYK(1., 0., 0., 0.))
     in
@@ -721,7 +723,7 @@ let title-deco =
       let line-width = get-text-width ctx in
       let title-ctx =
         ctx |> set-cjk-font font-cjk-gothic
-            |> set-latin-font font-latin-serif-italic
+            |> set-latin-font font-latin-sans
             |> set-font-size font-size-subsection
       in
       let head-ib =
