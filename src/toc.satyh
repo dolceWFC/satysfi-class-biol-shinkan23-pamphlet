@@ -61,7 +61,7 @@ end = struct
   let no-pads = (0pt, 0pt, 0pt, 0pt)
 
 
-  let font-size-normal  = 9pt
+  let font-size-normal  = 10pt
   let font-size-section = 25pt
   let font-size-subsection = 12pt
   let font-size-title = 36pt
