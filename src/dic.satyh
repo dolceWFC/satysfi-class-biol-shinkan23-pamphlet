@@ -1,0 +1,786 @@
+% License description
+% The following code is from "class-coins-shinkan23-pamphlet.satyh" (https://github.com/coins-shinkan23) contained in "coins-shinkan23/satysfi-class-coins-shinkan23-pamphlet" (https://github.com/coins-shinkan23/satysfi-class-coins-shinkan23-pamphlet/blob/main/src/class-coins-shinkan23-pamphlet.satyh), from which the code is borrowed and modified.
+% Also, the original code is borrowed from "stdjabook.satyh" (https://github.com/gfngfn) contained in "gfngfn/SATySFi" (https://github.com/gfngfn/SATySFi /SATySFi/blob/master/lib-satysfi/dist/packages/stdjabook.satyh).
+% Since SATySFi is licensed under LGPL-3.0, the same license was granted to satysfi-coinsshinkan23pamphlet.
+% At the time of borrowing, the authors of the original code were gfngfn (https://github.com/gfngfn), matsud224 (https://github.com/matsud224), puripuri2100 (https://github.com/puripuri2100), and nekketsuuu (https://github.com/nekketsuuu), momeemt(https://github.com/momeemt).
+
+% -*- coding: utf-8 -*-
+@require: pervasives
+@require: gr
+@require: list
+@require: math
+@require: code
+@require: color
+@require: option
+@require: annot
+@require: footnote-scheme
+@require: vdecoset
+@require: deco
+@require: base/int
+@require: num-conversion/num-conversion
+
+type position =
+  | Top
+  | Here
+
+module TwoColumn : sig
+
+  val document : 'a -> block-text -> document
+    constraint 'a :: (|
+      title : inline-text;
+      start-page : int;
+      is-roman-style-page-num : bool;
+    |)
+
+  direct \ref : [string] inline-cmd
+  direct \ref-page : [string] inline-cmd
+  direct +figure : [string?; position; inline-text; block-text] block-cmd
+  direct +table : [string?; position; inline-text; block-text] block-cmd
+  direct +p : [inline-text] block-cmd
+  direct +section : [string?; string?; inline-text; block-text] block-cmd
+  direct +subsection : [string?; string?; inline-text; block-text] block-cmd
+  direct +bunseki : [inline-text] block-cmd
+  direct +column : [inline-text; inline-text; block-text] block-cmd
+  direct +framebox : [block-text] block-cmd
+  direct +tsukuba-word : [string?; inline-text; inline-text] block-cmd
+  direct \emph : [inline-text] inline-cmd
+  direct \footnote : [inline-text] inline-cmd
+  direct \url : [string] inline-cmd
+
+end = struct
+
+
+  let generate-fresh-label =
+    let-mutable count <- 0 in
+      (fun () -> (
+        let () = count <- !count + 1 in
+          `generated:` ^ (arabic (!count))
+      ))
+
+
+  let no-pads = (0pt, 0pt, 0pt, 0pt)
+
+
+  let font-size-normal  = 10pt
+  let font-size-section = 25pt
+  let font-size-subsection = 12pt
+  let font-size-title = 36pt
+
+  let section-top-margin = 20pt
+  let section-bottom-margin = 12pt
+  let section-top-padding = 6pt
+  let section-bottom-padding = 7pt
+
+  let font-ratio = 1.
+
+  let font-latin-roman  = (`system:Baskerville` , font-ratio, 0.)
+  let font-latin-bold   = (`system:Baskerville-Bold` , font-ratio, 0.)
+  let font-latin-italic = (`system:Baskerville-Italic`, font-ratio, 0.)
+  let font-latin-sans   = (`system:Optima-Regular` , font-ratio, 0.)
+  let font-latin-mono   = (`Optima-ExtraBlack`    , font-ratio, 0.)
+  let font-cjk-mincho   = (`system:HiraMinPro-W3`    , font-ratio, 0.)
+  let font-cjk-gothic   = (`system:HiraginoSans-W3`    , font-ratio, 0.)
+
+
+  let set-latin-font font ctx =
+    ctx |> set-font Latin font
+
+
+  let set-cjk-font font ctx =
+    ctx |> set-font HanIdeographic font
+        |> set-font Kana           font
+
+  let set-font-gothic ctx =
+    ctx |> set-cjk-font font-cjk-gothic
+        |> set-latin-font font-cjk-gothic
+
+
+  let-inline ctx \sans it =
+    let ctx =
+      ctx |> set-latin-font font-latin-sans
+          |> set-cjk-font font-cjk-gothic
+    in
+    read-inline ctx it
+
+  let get-standard-context wid =
+    get-initial-context wid (command \math)
+      |> set-code-text-command Code.(command \code)
+      |> set-dominant-wide-script Kana
+      |> set-language Kana Japanese
+      |> set-language HanIdeographic Japanese
+      |> set-dominant-narrow-script Latin
+      |> set-language Latin English
+      |> set-font Kana           font-cjk-mincho
+      |> set-font HanIdeographic font-cjk-mincho
+      |> set-font Latin          font-latin-roman
+      |> set-math-font `lmodern`
+      |> set-hyphen-penalty 100
+      |> set-paragraph-margin 5pt 5pt
+      |> set-min-paragraph-ascender-and-descender 0pt 0pt
+      |> set-leading 5pt
+      |> set-min-gap-of-lines 5pt
+      |> set-font-size font-size-normal
+
+
+let title-deco =
+    let pads = (5pt, 5pt, 10pt, 10pt) in
+    let deco (x, y) wid hgt dpt =
+      let path1 =
+        let cx = 14pt in
+        let cy = 8pt in
+        let xL = x in
+        let xR = x +' wid in
+        let yT = y +' hgt in
+        let yB = y -' dpt in
+          start-path (xL, yT)
+            |> line-to (xR, yT)
+            |> bezier-to (xR +' cx, yT -' cy) (xR +' cx, yB +' cy) (xR, yB)
+            |> line-to (xL, yB)
+            |> close-with-bezier (xL -' cx, yB +' cy) (xL -' cx, yT -' cy)
+      in
+      let path2 =
+        let cx = 12pt in
+        let cy = 8pt in
+        let gapx = 3pt in
+        let gapy = 5pt in
+        let xL = x +' gapx in
+        let xR = x +' wid -' gapx in
+        let yT = y +' hgt -' gapy in
+        let yB = y -' dpt +' gapy in
+          start-path (xL, yT)
+            |> line-to (xR, yT)
+            |> bezier-to (xR +' cx, yT -' cy) (xR +' cx, yB +' cy) (xR, yB)
+            |> line-to (xL, yB)
+            |> close-with-bezier (xL -' cx, yB +' cy) (xL -' cx, yT -' cy)
+      in
+        [
+          stroke 3pt Color.black path1;
+          stroke 1pt Color.black path2;
+        ]
+    in
+      (deco, deco, deco, deco)
+
+
+  let make-section-title ctx =
+    ctx |> set-font-size font-size-section
+        |> set-font Latin font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+
+  let make-subsection-title ctx =
+    ctx |> set-font-size font-size-subsection
+        |> set-font Latin font-latin-sans
+        |> set-cjk-font font-cjk-gothic
+
+
+  let-mutable toc-acc-ref <- []
+  let-mutable outline-ref <- []
+
+
+  let get-cross-reference-number label =
+    match get-cross-reference (label ^ `:num`) with
+    | None    -> `?`
+    | Some(s) -> s
+
+
+  let get-cross-reference-page label =
+    match get-cross-reference (label ^ `:page`) with
+    | None    -> `?`
+    | Some(s) -> s
+
+
+  let draw-text-centering (x,y) ib =
+    let (w, h, d) = get-natural-metrics ib in
+    let x-gap = w *' 0.5 in
+    let y-gap = (h +' d) *' 0.5 -' d in
+    draw-text (x -' x-gap, y -' y-gap) ib
+
+  let chapter-heading ctx num title show-title-num =
+    let line-width = get-text-width ctx in
+    let ctx =
+      ctx |> set-paragraph-margin 15pt 1pt
+          |> set-min-paragraph-ascender-and-descender 0pt 0pt
+          |> set-leading 4pt
+    in
+    let bar-height = 45pt in
+    let circle-size = 33pt in
+    let ctx-d =
+      ctx |> set-cjk-font font-cjk-gothic
+          |> set-text-color Color.white
+          |> set-font-size 23pt
+    in
+    let dai-ib = read-inline ctx-d {第} in
+    let syou-ib = read-inline ctx-d {章} in
+    let num-it = num |> arabic |> embed-string in
+    let ctx-num  =
+      ctx |> set-cjk-font font-cjk-gothic
+          |> set-text-color Color.white
+          |> set-font-size 50pt
+    in
+    let num-ib = read-inline ctx-num num-it in
+    let bb-num =
+      line-break false false ctx (
+        inline-graphics line-width bar-height 0pt (fun pt ->
+          List.map (shift-graphics pt)
+            [
+              % 背景の帯
+              Gr.rectangle (0pt, 0pt) (line-width, bar-height)
+              |> fill (Color.gray 0.2);
+              Gr.circle (line-width *' 0.5, bar-height *' 0.5) circle-size
+              |> fill (Color.gray 0.2);
+              draw-text-centering (line-width *' 0.38, bar-height *' 0.5) dai-ib;
+              draw-text-centering (line-width *' 0.5, bar-height *' 0.5) num-ib;
+              draw-text-centering (line-width *' 0.62, bar-height *' 0.5) syou-ib;
+            ]
+        )
+      )
+    in
+    let ctx-title =
+      ctx |> set-font-size font-size-title
+          |> set-font-gothic
+    in
+    let ib-title = inline-fil ++ (read-inline ctx-title title) ++ inline-fil in
+    let bb-title = line-break false false ctx-title ib-title in
+    let bar-height = 2pt in
+    let bar =
+      line-break false false ctx-title (
+        inline-graphics line-width (bar-height *' 0.5) (bar-height *' 0.5) (fun pt ->
+          [
+            Gr.line (0pt, 0pt) (line-width, 0pt)
+            |> stroke bar-height (Color.gray 0.2)
+            |> shift-graphics pt
+          ]
+        )
+      )
+    in
+      if show-title-num then
+        bb-num +++ bb-title +++ bar
+      else
+        bb-title
+
+
+  let-inline ctx \dummy it =
+    let ib = read-inline (ctx |> set-text-color Color.white) it in
+    let w = get-natural-width ib in
+      ib ++ inline-skip (0pt -' w)
+
+
+  let-mutable ref-float-boxes <- []
+
+  let height-of-float-boxes pageno =
+    %    let () = display-message `get height` in
+        (!ref-float-boxes) |> List.fold-left (fun h (pn, bb) -> (
+          if pn < pageno then h +' (get-natural-length bb) else h
+        )) 0pt
+
+  let-mutable does-page-breaking-reach-last <- false
+  let-mutable ref-current-page <- 0
+
+  let top-space = 40pt
+  let bottom-space = 60pt
+  let config =
+    (|
+      show-pages    = true;
+      paper-width   = 210mm;
+      paper-height  = 297mm;
+      text-width    = 440pt;
+      text-height   = 297mm -' top-space -' bottom-space;
+      text-origin   = (80pt, top-space);
+      header-origin = (80pt, 30pt);
+      footer-origin = (80pt, 297mm -' bottom-space +' 10pt);
+      header-width  = 440pt;
+      footer-width  = 440pt;
+    |)
+
+  let paper-width = config#paper-width
+  let paper-height = config#paper-height
+  let page = UserDefinedPaper(paper-width, paper-height)
+  let txtorg = config#text-origin
+  let txtwid = config#text-width
+  let txthgt = config#text-height
+  let hdrorg = config#header-origin
+  let ftrorg = config#footer-origin
+  let hdrwid = config#header-width
+  let ftrwid = config#footer-width
+  let show-pages = config#show-pages
+
+  let-mutable num-chapter <- 0
+  let-mutable start-page <- 0
+
+  let document record inner =
+    let title = record#title in
+    let () = start-page <- record#start-page - 1 in
+    let () =
+      register-cross-reference `changed` `F`
+    in
+    let ctx-doc = get-standard-context ((txtwid -' 50pt) *' 0.5) in
+    let bb-main = read-block ctx-doc inner in
+    % -- page settings --
+    let pagecontf pbinfo =
+      let pageno = pbinfo#page-number + !start-page in
+      let hgtfb = height-of-float-boxes pageno in
+      let () = ref-current-page <- pageno in
+      let (txtorgx, txtorgy) =
+        if pageno mod 2 == 0 then
+          % 偶数ページの場合は左側が小口で右側がのど
+          let (x,y) = txtorg in
+          (paper-width -' txtwid -' x, y)
+        else
+          % 奇数ページの場合は左側がのどで右側が小口
+          txtorg
+      in
+      (|
+        text-origin = (txtorgx, txtorgy +' hgtfb);
+        text-height = txthgt -' hgtfb;
+      |)
+    in
+    let pagepartsf pbinfo =
+      let pageno = pbinfo#page-number + !start-page in
+      let header =
+        let ctx =
+          get-standard-context hdrwid
+            |> set-paragraph-margin 0pt 0pt
+        in
+        let ib-text =
+          if pageno mod 2 == 0 then
+            (inline-fil ++ read-inline ctx title)
+          else
+            (read-inline ctx title ++ inline-fil)
+        in
+%        let () = display-message `insert` in
+        let (bb-float-boxes, acc) =
+          (!ref-float-boxes) |> List.fold-left (fun (bbacc, acc) elem -> (
+            let (pn, bb) = elem in
+              if pn < pageno then
+                let () = display-message (`use `# ^ arabic pn) in
+                let bbs =
+                  line-break true true (ctx |> set-paragraph-margin 0pt 12pt)
+                    (inline-fil ++ embed-block-top ctx txtwid (fun _ -> bb) ++ inline-fil)
+                      % 'ctx' is a dummy context
+                in
+                  (bbacc +++ bbs, acc)
+              else
+                (bbacc, elem :: acc)
+          )) (block-nil, [])
+        in
+        let () = ref-float-boxes <- acc in
+          bb-float-boxes
+      in
+      let footer =
+        let ctx = get-standard-context ftrwid in
+        let bar-width = 5pt in
+        let bar-height = get-font-size ctx *' 1.2 in
+        let bar-depth = get-font-size ctx *' 0.5 in
+        let bar =
+          inline-graphics bar-width bar-height bar-depth (fun pt ->
+            [
+              Gr.rectangle (0pt, bar-depth *' (-1.0)) (bar-width, bar-height)
+              |> fill (Color.gray 0.2)
+              |> shift-graphics pt
+            ]
+          )
+        in
+        let it-pageno =
+          if record#is-roman-style-page-num then
+            let str = match NumConversion.to-roman-lower pageno with
+                      | None -> arabic pageno
+                      | Some(rl) -> rl
+            in
+              embed-string str
+          else
+            embed-string (arabic pageno)
+        in
+        if pageno mod 2 == 0 then
+          % 偶数ページは左端にページ番号
+          line-break true true ctx
+            (
+              (read-inline ctx {#it-pageno;}) ++ inline-skip 5pt ++
+              bar ++ inline-skip 5pt ++ read-inline ctx title
+            )
+        else
+          line-break true true ctx
+            (
+              inline-fil ++ read-inline ctx {2023年度生物学類新歓パンフレット} ++ inline-skip 5pt ++
+              bar ++ inline-skip 5pt ++ (read-inline ctx {#it-pageno;})
+            )
+      in
+        (|
+          header-origin  = hdrorg;
+          header-content = header;
+          footer-origin  = ftrorg;
+          footer-content = footer;
+        |)
+    in
+    % -- column settings --
+    let columnhookf () =
+      let () = FootnoteScheme.start-page () in
+      let () = display-message `column start.` in
+      block-nil
+    in
+    let columnendhookf () =
+      let pageno = !ref-current-page in
+      let last = !does-page-breaking-reach-last in
+      let remains =
+        (!ref-float-boxes) |> List.fold-left (fun b (pn, _) -> (
+          if pn < pageno then b else true
+        )) false
+      in
+      let () =
+        let s1 = if last then `T` else `F` in
+        let s2 = if remains then `T` else `F` in
+        display-message (`column end `# ^ arabic pageno ^ #` (last: `# ^ s1 ^ `, remains: `# ^ s2 ^ `)`)
+      in
+      if last then
+        if remains then
+          block-skip 0pt  % adds a new page for remaining figures
+        else
+          block-nil
+      else
+        block-nil
+    in
+
+    let bb-last =
+      hook-page-break-block (fun _ _ -> (
+        let () = display-message `reach last.` in
+        does-page-breaking-reach-last <- true
+      ))
+    in
+    let doc = page-break-multicolumn page [txtwid *' 0.5] columnhookf columnendhookf pagecontf pagepartsf (bb-main +++ bb-last) in
+    let () = register-outline (List.reverse !outline-ref) in
+      doc
+
+  let-inline ctx \ref key =
+    let opt = get-cross-reference (key ^ `:num`) in
+    let it =
+      match opt with
+      | None    -> {?}
+      | Some(s) -> embed-string s
+    in
+      inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
+
+  let add-start-page s =
+    let page-num = Int.of-string s in
+    arabic (page-num + !start-page)
+
+  let-inline ctx \ref-page key =
+    let opt = get-cross-reference (key ^ `:page`) in
+    let it =
+      match opt with
+      | None    -> {?}
+      | Some(s) -> embed-string (add-start-page s)
+    in
+      inline-frame-breakable no-pads (Annot.link-to-location-frame key None) (read-inline ctx it)
+
+
+  let-mutable ref-figure <- 0
+  let-mutable ref-table <- 0
+
+
+  let-block ctx +figure ?:labelopt position caption inner =
+    let () = ref-figure <- !ref-figure + 1 in
+    let s-num = (arabic !num-chapter) ^ `.` ^ (arabic !ref-figure) in
+    let () =
+      match labelopt with
+      | Some(label) -> register-cross-reference (label ^ `:num`) s-num
+      | None        -> ()
+    in
+    let it-num = embed-string s-num in
+    let ds =
+      match labelopt with
+      | Some(label) -> Annot.register-location-frame label
+      | None        ->
+        let d (_, _) _ _ _ = [] in (d, d, d, d)
+    in
+    let bb-inner =
+      block-frame-breakable (ctx |> set-paragraph-margin 0pt 0pt) (0pt, 0pt, 15pt, 15pt) ds (fun ctx -> (
+        let ctx = ctx  |> set-paragraph-margin 5pt 5pt in
+        read-block ctx inner
+          +++ block-skip 1pt
+          +++ line-break true true ctx (inline-fil ++ read-inline ctx {図#it-num; #caption;} ++ inline-fil)
+      ))
+    in
+    match position with
+    | Top -> (
+      hook-page-break-block (fun pbinfo _ -> (
+%        let () = display-message (`register` ^ (arabic pbinfo#page-number)) in
+        ref-float-boxes <- (pbinfo#page-number + !start-page, bb-inner) :: !ref-float-boxes
+      ))
+    )
+    | Here -> bb-inner
+
+
+  let-block ctx +table ?:labelopt position caption inner =
+    let () = ref-table <- !ref-table + 1 in
+    let s-num = (arabic !num-chapter) ^ `.` ^ (arabic !ref-table) in
+    let () =
+      match labelopt with
+      | Some(label) -> register-cross-reference (label ^ `:num`) s-num
+      | None        -> ()
+    in
+    let it-num = embed-string s-num in
+    let ds =
+      match labelopt with
+      | Some(label) -> Annot.register-location-frame label
+      | None        ->
+        let d (_, _) _ _ _ = [] in (d, d, d, d)
+    in
+    let bb-inner =
+      block-frame-breakable (ctx |> set-paragraph-margin 0pt 0pt) (0pt, 0pt, 15pt, 15pt) ds (fun ctx -> (
+        let ctx = ctx  |> set-paragraph-margin 5pt 5pt in
+        read-block ctx inner
+          +++ block-skip 1pt
+          +++ line-break true true ctx (inline-fil ++ read-inline ctx {図#it-num; #caption;} ++ inline-fil)
+      ))
+    in
+    match position with
+    | Top -> (
+      hook-page-break-block (fun pbinfo _ -> (
+%        let () = display-message (`register` ^ (arabic pbinfo#page-number)) in
+        ref-float-boxes <- (pbinfo#page-number + !start-page, bb-inner) :: !ref-float-boxes
+      ))
+    )
+    | Here -> bb-inner
+
+
+  let-mutable num-section <- 0
+  let-mutable num-subsection <- 0
+
+
+  let quad-indent ctx =
+    inline-skip (get-font-size ctx)
+
+
+  let-block ctx +p inner =
+    let ib-inner = read-inline ctx inner in
+    let br-parag =
+      (quad-indent ctx) ++ ib-inner ++ inline-fil
+    in
+      form-paragraph ctx br-parag
+
+
+  let-block ctx +bunseki name =
+    let br-parag =
+      inline-fil ++ read-inline ctx { 《文責: #name;》 }
+    in
+      form-paragraph ctx br-parag
+
+
+  let section-scheme ctx label title outline-title-opt inner =
+    let ctx-title = make-section-title ctx in
+    let () = num-section <- !num-section + 1 in
+    let () = num-subsection <- 0 in
+    let s-num = arabic (!num-chapter) ^ `.` ^ arabic (!num-section) in
+    let () = register-cross-reference (label ^ `:num`) s-num in
+    let ib-num =
+      read-inline ctx-title (embed-string (s-num ^ `.`))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let outline-title = Option.from (extract-string ib-title) outline-title-opt in
+    let () = outline-ref <- (0, s-num ^ `. `#  ^ outline-title, label, false) :: !outline-ref in
+    let bb-title =
+      let ib =
+        inline-frame-breakable no-pads (Annot.register-location-frame label)
+          (ib-num ++ (inline-skip 10pt) ++ ib-title ++ (inline-fil))
+      in
+      line-break true false (ctx |> set-paragraph-margin section-top-margin section-bottom-margin) ib
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+  let subsection-scheme ctx label title outline-title-opt inner =
+    let () = num-subsection <- !num-subsection + 1 in
+    let s-num = arabic (!num-chapter) ^ `.` ^ arabic (!num-section) ^ `.` ^ arabic (!num-subsection) in
+    let () = register-cross-reference (label ^ `:num`) s-num in
+    let ctx-title = make-subsection-title ctx in
+    let ib-num =
+      read-inline ctx-title (embed-string (s-num ^ `.`))
+        ++ hook-page-break (fun pbinfo _ -> register-cross-reference (label ^ `:page`) (arabic pbinfo#page-number))
+    in
+    let ib-title = read-inline ctx-title title in
+    let outline-title = Option.from (extract-string ib-title) outline-title-opt in
+    let () = outline-ref <- (1, s-num ^ `. `#  ^ outline-title, label, false) :: !outline-ref in
+    let bb-title =
+      line-break true false (ctx |> set-paragraph-margin section-top-margin section-bottom-margin)
+        (inline-frame-breakable no-pads (Annot.register-location-frame label)
+          (ib-num ++ (inline-skip 10pt) ++ ib-title ++ (inline-fil)))
+    in
+    let bb-inner = read-block ctx inner in
+      bb-title +++ bb-inner
+
+
+  let-block ctx +section ?:labelopt ?:outline-title-opt title inner =
+    let label =
+      match labelopt with
+      | None        -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      section-scheme ctx label title outline-title-opt inner
+
+
+  let-block ctx +subsection ?:labelopt ?:outline-title-opt title inner =
+    let label =
+      match labelopt with
+      | None        -> generate-fresh-label ()
+      | Some(label) -> label
+    in
+      subsection-scheme ctx label title outline-title-opt inner
+
+
+  let-inline ctx \emph inner =
+    let ctx-emph =
+      ctx |> set-font Latin font-latin-sans
+          |> set-cjk-font font-cjk-gothic
+          |> set-text-color (CMYK(1., 0., 0., 0.))
+    in
+      read-inline ctx-emph inner
+
+
+  let-inline ctx \footnote it =
+    let size = get-font-size ctx in
+    let ibf num =
+      let it-num = embed-string (arabic num) in
+      let ctx =
+        ctx |> set-font-size (size *' 0.75)
+            |> set-manual-rising (size *' 0.25)
+      in
+        read-inline ctx {\*#it-num;}
+    in
+    let bbf num =
+      let it-num = embed-string (arabic num) in
+      let ctx =
+        ctx |> set-font-size (size *' 0.9)
+            |> set-leading (size *' 1.2)
+            |> set-paragraph-margin (size *' 0.5) (size *' 0.5)
+          %temporary
+      in
+        line-break false false ctx (read-inline ctx {#it-num; #it;} ++ inline-fil)
+    in
+      FootnoteScheme.main ctx ibf bbf
+
+
+  let-inline ctx \non-hyph str =
+    let s-lst = string-explode str in
+    let f i =
+      let char = string-unexplode [i] in
+      let ib = char |> embed-string |> read-inline ctx in
+      ib
+    in
+    s-lst
+    |> List.map f
+    |> List.fold-left (++) inline-nil
+
+  let-inline \url url = {\href (url) {\non-hyph(url);}}
+
+
+  let-mutable column-num <- 0
+
+  let-block ctx +column title author text =
+    let () = column-num <- !column-num + 1 in
+    let column-num-it = !column-num |> arabic |> embed-string in
+    let chapter-num-it = !num-chapter |> arabic |> embed-string in
+    let side-gap = 2pt in
+    let pads = (side-gap, side-gap, 5pt, 5pt) in
+    let bar-color = Color.gray 0.3 in
+    let bar-height = 2pt in
+    let deco-set =
+      let top-bar (x,y) w h d =
+        Gr.line (0pt, h +' d) (w, h +' d)
+        |> stroke bar-height bar-color
+        |> shift-graphics (x,y)
+      in
+      let bottom-bar (x,y) w h d =
+        Gr.line (0pt, 0pt) (w, 0pt)
+        |> stroke bar-height bar-color
+        |> shift-graphics (x,y)
+      in
+      let decoS (x,y) w h d =
+        [
+          top-bar (x,y) w h d;
+          bottom-bar (x,y) w h d;
+        ]
+      in
+      let decoH (x,y) w h d =
+        [
+          top-bar (x,y) w h d;
+        ]
+      in
+      let decoT (x,y) w h d =
+        [
+          bottom-bar (x,y) w h d;
+        ]
+      in
+      (decoS, decoH, Deco.empty, decoT)
+    in
+    let ctx = ctx |> set-paragraph-margin 50pt 15pt in
+    block-frame-breakable ctx pads deco-set (fun ctx -> (
+      let ctx =
+        ctx |> set-paragraph-margin 5pt 5pt
+            |> set-min-paragraph-ascender-and-descender 0pt 0pt
+            |> set-leading 4pt
+      in
+      let line-width = get-text-width ctx in
+      let title-ctx =
+        ctx |> set-cjk-font font-cjk-gothic
+            |> set-latin-font font-latin-sans
+            |> set-font-size font-size-subsection
+      in
+      let head-ib =
+        inline-skip side-gap ++
+        read-inline title-ctx {Column #chapter-num-it;.#column-num-it; #title;} ++
+        inline-fil ++
+        read-inline ctx {\sans{文責：#author;}} ++
+        inline-skip side-gap
+      in
+      let bar-height = 2pt in
+      let bar =
+        line-break false false ctx (
+          inline-graphics line-width (bar-height *' 0.5) (bar-height *' 0.5) (fun pt ->
+            [
+              Gr.line (0pt, 0pt) (line-width, 0pt)
+              |> stroke bar-height (Color.gray 0.6)
+              |> shift-graphics pt
+            ]
+          )
+        )
+      in
+      let pads = (side-gap, side-gap, 0pt, 0pt) in
+      line-break true false ctx head-ib +++ bar +++
+      block-frame-breakable ctx pads VDecoSet.empty (fun ctx -> read-block ctx text)
+    ))
+
+
+  let-block ctx +framebox text =
+    let pads = (10pt, 10pt, 10pt, 10pt) in
+    let deco-set = VDecoSet.simple-frame 2pt Color.black Color.white in
+    let ctx = ctx |> set-paragraph-margin 15pt 15pt in
+    block-frame-breakable ctx pads deco-set (fun ctx -> (
+      let ctx = ctx |> set-paragraph-margin 5pt 5pt in
+      read-block ctx text
+    ))
+
+  let-block ctx +tsukuba-word ?:word-str yomi description =
+    let ctx-head = ctx |> set-cjk-font font-cjk-gothic
+                       |> set-latin-font font-cjk-gothic
+                       |> set-font-size 10pt
+    in
+    let head =
+      match word-str with
+      | Some(word-str) -> let word = embed-string word-str in
+                            read-inline ctx-head {#yomi;【#word;】}
+      | None           -> read-inline ctx-head {#yomi;　}
+    in
+    let body = read-inline ctx {#description;} in
+    let b1 = line-break true true ctx head in
+    let b2 =
+      let br-parag =
+        body ++ inline-fil
+      in
+        form-paragraph ctx br-parag
+    in
+      b1 +++ b2
+
+end
+
+let document = TwoColumn.document
